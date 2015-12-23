@@ -1,0 +1,10 @@
+fixtures:
+  repositories:
+    postgresql:
+      repo: 'https://github.com/Adaptavist/puppet-postgresql'
+    stdlib:
+      repo: 'https://github.com/Adaptavist/puppet-stdlib'
+    concat: 
+      repo: "https://github.com/Adaptavist/puppet-concat.git"
+  symlinks:
+    postgresconfig: "#{source_dir}"
