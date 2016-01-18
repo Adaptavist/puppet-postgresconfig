@@ -1,6 +1,5 @@
-
 # PostgresConfig Module
-
+[![Build Status](https://travis-ci.org/Adaptavist/puppet-postgresconfig.svg?branch=master)](https://travis-ci.org/Adaptavist/puppet-postgresconfig)
 ## Overview
 
 The **PostgresConfig** module installs and configures a postgres database on any node where it has been included and at least a trivial database configuration exists in Hiera.
