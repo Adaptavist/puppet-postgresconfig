@@ -15,5 +15,9 @@ class postgresconfig::params {
           'RedHat' => 'postgresql-devel',
           'Debian' => "postgresql-server-dev-${postgresql::globals::globals_version}"
     }
+    $create_auth_file = 'false'
+    $auth_file = '/root/.pgpass'
+    $auth_file_owner = 'root'
+    $auth_file_group = 'root'
 }
 

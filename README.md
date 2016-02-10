@@ -42,12 +42,30 @@ A flag to determine if the development package should be installed, defaults to 
 
 The name of the development package, this is set based on operating system family and should not usually be set manually
 
+`postgresconfig::create_auth_file:`
+
+Flag to determine if a .pgpass file should be created, this flag is ignored if `postgres_password` is not set, defaults to false
+
+`postgresconfig::auth_file:`
+
+The location of the .pgpass file to create, defaults to '/root/.pgpass'
+
+`postgresconfig::auth_file_owner:`
+
+The owner of the .pgpass file, defaults to 'root'
+
+`postgresconfig::auth_file_group:`
+
+The group of the .pgpass file, defaults to 'root'
+
 ## Example Usage:
  
     postgresconfig::listen_address: '127.0.0.1'
     postgresconfig::listen_port: '5432'
     postgresconfig::install_contrib: true
     postgresconfig::install_devel: true
+    postgresconfig::postgres_password: 'super-secret-password'
+    postgresconfig::create_auth_file: true
     postgresconfig::config_enties:
         max_connections:
             value: '200'
@@ -71,3 +89,4 @@ The name of the development package, this is set based on operating system famil
 This module depends on the following puppet modules:
 
 * Postgresql
+

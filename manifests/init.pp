@@ -8,6 +8,10 @@ class postgresconfig (
     $install_devel     = $postgresconfig::params::install_devel,
     $devel_package     = $postgresconfig::params::devel_package,
     $postgres_password = $postgresconfig::params::postgres_password,
+    $create_auth_file  = $postgresconfig::params::create_auth_file,
+    $auth_file         = $postgresconfig::params::auth_file,
+    $auth_file_owner   = $postgresconfig::params::auth_file_owner,
+    $auth_file_group   = $postgresconfig::params::auth_file_group,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
@@ -19,6 +23,21 @@ class postgresconfig (
         $real_postgres_password = undef
     } else {
         $real_postgres_password = $postgres_password
+        # create a pgpass file if requested to do so
+        if (str2bool($create_auth_file)) {
+            file { $auth_file:
+                ensure  => 'present',
+                content => template("${name}/pgpass.erb"),
+                owner   => $auth_file_owner,
+                group   => $auth_file_group,
+                mode    => '0600',
+            }
+        # if not ensure its not there
+        } else {
+            file { $auth_file:
+                ensure  => 'absent'
+            }
+        }
     }
 
     # install/configure postgres
