@@ -7,6 +7,17 @@ auth_file = '/etc/my_auth_file'
 auth_file_owner = 'postgres'
 auth_file_group = 'postgres'
 
+hba_rules = { '001' => {
+       'type'        => 'local',
+       'auth_method' => 'ident',
+       'order'       => '001',
+       'description' => 'local access as postgres user',
+       'auth_option' => 'false',
+       'user'        => 'all',
+       'database'    => 'all',
+       'address'     => 'false'  }
+}
+
 describe 'postgresconfig', :type => 'class' do
 	# facts needed by postgresql, taken from puppet-postgresql spec tests
     let :facts do 
@@ -131,6 +142,28 @@ describe 'postgresconfig', :type => 'class' do
         'postgres_password'  => nil
       )
       should_not contain_file(auth_file)
+    }
+  end
+
+    context "Should create hba_rule with address and auth_option undef" do
+    let(:params) { 
+      { 
+          :listen_address => listen_address,
+          :listen_port => listen_port,
+          :hba_rules => hba_rules,
+      } 
+    }
+
+    it {
+      should contain_postgresql__server__pg_hba_rule('local access as postgres user').with(
+        'type'        => 'local',
+        'auth_method' => 'ident',
+        'auth_option' => nil,
+        'order'       => '001',
+        'user'        => 'all',
+        'database'    => 'all',
+        'address'     => nil,
+      )
     }
   end
 
