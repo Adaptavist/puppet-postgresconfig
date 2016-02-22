@@ -9,14 +9,26 @@ define postgresconfig::hba_rule (
     $address     = undef,
     ) {
 
+    if ($auth_option == false) or ($auth_option == 'false') {
+        $real_auth_option = undef
+    } else {
+        $real_auth_option = $auth_option
+    }
+
+    if ($address == false) or ($address == 'false') {
+        $real_address = undef
+    } else {
+        $real_address = $address
+    }
+
     postgresql::server::pg_hba_rule { $description:
         type        => $type,
         auth_method => $auth_method,
-        auth_option => $auth_option,
+        auth_option => $real_auth_option,
         order       => $order,
         user        => $user,
         database    => $database,
-        address     => $address,
+        address     => $real_address,
     }
 }
 
