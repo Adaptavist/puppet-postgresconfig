@@ -18,6 +18,16 @@ hba_rules = { '001' => {
        'address'     => 'false'  }
 }
 
+roles = { 'repl' => {
+       'password'    => 'super_secret',
+       'createdb'    => 'false',
+       'createrole'  => 'false',
+       'login'       => 'true',
+       'inherit'     => 'true',
+       'superuser'   => 'false',
+       'replication' => 'true'  }
+}
+
 describe 'postgresconfig', :type => 'class' do
 	# facts needed by postgresql, taken from puppet-postgresql spec tests
     let :facts do 
@@ -145,7 +155,7 @@ describe 'postgresconfig', :type => 'class' do
     }
   end
 
-    context "Should create hba_rule with address and auth_option undef" do
+  context "Should create hba_rule with address and auth_option undef" do
     let(:params) { 
       { 
           :listen_address => listen_address,
@@ -163,6 +173,29 @@ describe 'postgresconfig', :type => 'class' do
         'user'        => 'all',
         'database'    => 'all',
         'address'     => nil,
+      )
+    }
+  end
+
+  context "Should create user repl with replication privileges" do
+    let(:params) { 
+      { 
+          :listen_address => listen_address,
+          :listen_port => listen_port,
+          :hba_rules => hba_rules,
+          :roles => roles,
+      } 
+    }
+
+    it {
+      should contain_postgresql__server__role('repl').with(
+       'password_hash' => 'super_secret',
+       'createdb'      => 'false',
+       'createrole'    => 'false',
+       'login'         => 'true',
+       'inherit'       => 'true',
+       'superuser'     => 'false',
+       'replication'   => 'true'  
       )
     }
   end
