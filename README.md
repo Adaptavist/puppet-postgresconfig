@@ -58,6 +58,10 @@ The owner of the .pgpass file, defaults to 'root'
 
 The group of the .pgpass file, defaults to 'root'
 
+`postgresconfig::roles`
+
+A hash of postgres roles to create
+
 ## Example Usage:
  
     postgresconfig::listen_address: '127.0.0.1'
@@ -83,6 +87,15 @@ The group of the .pgpass file, defaults to 'root'
             auth_method: 'md5'
             order: '002'
             description: 'local access to database with same name'
+    postgresconfig::roles:
+        'user1':
+            password: "either plain text password or postgres password hash"
+            createdb: "false"
+            createrole: "false"
+            login: "true"
+            inherit: "true"
+            superuser: "false"
+            replication: "false"
 
 ## Dependencies
 
