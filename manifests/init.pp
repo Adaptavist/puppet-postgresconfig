@@ -12,6 +12,7 @@ class postgresconfig (
     $auth_file         = $postgresconfig::params::auth_file,
     $auth_file_owner   = $postgresconfig::params::auth_file_owner,
     $auth_file_group   = $postgresconfig::params::auth_file_group,
+    $roles             = $postgresconfig::params::roles,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
@@ -74,5 +75,11 @@ class postgresconfig (
             ensure  => 'present',
             require => Package[$postgresql::server::package_name]
         }
+    }
+
+    # if any roles have been provided creaet them
+    if ($roles) {
+        validate_hash($roles)
+        create_resources(postgresconfig::role, $roles)
     }
 }

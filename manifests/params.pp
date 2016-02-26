@@ -19,5 +19,6 @@ class postgresconfig::params {
     $auth_file = '/root/.pgpass'
     $auth_file_owner = 'root'
     $auth_file_group = 'root'
+    $roles = {}
 }
 
