@@ -13,6 +13,9 @@ class postgresconfig (
     $auth_file_owner   = $postgresconfig::params::auth_file_owner,
     $auth_file_group   = $postgresconfig::params::auth_file_group,
     $roles             = $postgresconfig::params::roles,
+    $selinux_context   = $postgresconfig::params::selinux_context,
+    $semanage_package  = $postgresconfig::params::semanage_package,
+    $datadir           = $postgresconfig::params::datadir,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
@@ -49,6 +52,12 @@ class postgresconfig (
         postgres_password    => $real_postgres_password,
     }
 
+    if ($datadir == 'false' or $datadir == false){
+        $real_datadir = $postgresql::server::datadir
+    } else {
+        $real_datadir = $datadir
+    }
+
     # if there are configuration options, call the define to set them
     if ($config_enties != 'false' or $config_enties != false ) {
         validate_hash($config_enties)
@@ -77,9 +86,18 @@ class postgresconfig (
         }
     }
 
-    # if any roles have been provided creaet them
+    # if any roles have been provided create them
     if ($roles) {
         validate_hash($roles)
         create_resources(postgresconfig::role, $roles)
+    }
+
+    # if selinux is enabled set the correct context on the datadir
+    if str2bool($::selinux) {
+        ensure_packages([$semanage_package])
+        
+        exec { 'postgres_datadir_selinux':
+            command => "semanage fcontext -a -t ${selinux_context} \"${real_datadir}(/.*)?\" && restorecon -R -v ${real_datadir}"
+        }
     }
 }
