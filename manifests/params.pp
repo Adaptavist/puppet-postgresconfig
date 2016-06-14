@@ -20,5 +20,11 @@ class postgresconfig::params {
     $auth_file_owner = 'root'
     $auth_file_group = 'root'
     $roles = {}
+    $selinux_context = 'postgresql_db_t'
+    $semanage_package = $::osfamily ? {
+        'RedHat' => 'policycoreutils-python',
+        'Debian' => 'policycoreutils',
+    }
+    $datadir = 'false'
 }
 
