@@ -1,25 +1,29 @@
 class postgresconfig (
-    $listen_address    = $postgresconfig::params::listen_address,
-    $listen_port       = $postgresconfig::params::listen_port,
-    $config_enties     = $postgresconfig::params::config_enties,
-    $hba_rules         = $postgresconfig::params::hba_rules,
-    $install_contrib   = $postgresconfig::params::install_contrib,
-    $contrib_package   = $postgresconfig::params::contrib_package,
-    $install_devel     = $postgresconfig::params::install_devel,
-    $devel_package     = $postgresconfig::params::devel_package,
-    $postgres_password = $postgresconfig::params::postgres_password,
-    $create_auth_file  = $postgresconfig::params::create_auth_file,
-    $auth_file         = $postgresconfig::params::auth_file,
-    $auth_file_owner   = $postgresconfig::params::auth_file_owner,
-    $auth_file_group   = $postgresconfig::params::auth_file_group,
-    $roles             = $postgresconfig::params::roles,
-    $selinux_context   = $postgresconfig::params::selinux_context,
-    $semanage_package  = $postgresconfig::params::semanage_package,
-    $datadir           = $postgresconfig::params::datadir,
+    $listen_address       = $postgresconfig::params::listen_address,
+    $listen_port          = $postgresconfig::params::listen_port,
+    $config_enties        = $postgresconfig::params::config_enties,
+    $hba_rules            = $postgresconfig::params::hba_rules,
+    $install_contrib      = $postgresconfig::params::install_contrib,
+    $contrib_package      = $postgresconfig::params::contrib_package,
+    $install_devel        = $postgresconfig::params::install_devel,
+    $devel_package        = $postgresconfig::params::devel_package,
+    $postgres_password    = $postgresconfig::params::postgres_password,
+    $create_auth_file     = $postgresconfig::params::create_auth_file,
+    $auth_file            = $postgresconfig::params::auth_file,
+    $auth_file_owner      = $postgresconfig::params::auth_file_owner,
+    $auth_file_group      = $postgresconfig::params::auth_file_group,
+    $roles                = $postgresconfig::params::roles,
+    $selinux_context      = $postgresconfig::params::selinux_context,
+    $semanage_package     = $postgresconfig::params::semanage_package,
+    $datadir              = $postgresconfig::params::datadir,
+    $manage_recovery_conf = $postgresconfig::params::manage_recovery_conf,
+    $recovery_params      = $postgresconfig::params::recovery_params,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
         undef => true,
+        'false' => true,
+        false => true,
         default => false,
     }
 
@@ -50,6 +54,7 @@ class postgresconfig (
         port                 => $listen_port,
         pg_hba_conf_defaults => $use_default_hba_rules,
         postgres_password    => $real_postgres_password,
+        manage_recovery_conf => str2bool($manage_recovery_conf)
     }
 
     if ($datadir == 'false' or $datadir == false){
@@ -90,6 +95,11 @@ class postgresconfig (
     if ($roles) {
         validate_hash($roles)
         create_resources(postgresconfig::role, $roles)
+    }
+
+    if (str2bool($manage_recovery_conf)){
+        validate_hash($roles)
+        create_resources(postgresql::server::recovery, $recovery_params)
     }
 
     # if selinux is enabled set the correct context on the datadir
