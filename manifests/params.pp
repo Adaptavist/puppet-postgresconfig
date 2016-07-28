@@ -26,5 +26,7 @@ class postgresconfig::params {
         'Debian' => 'policycoreutils',
     }
     $datadir = 'false'
+    $manage_recovery_conf = 'false'
+    $recovery_params = {}
 }
 
