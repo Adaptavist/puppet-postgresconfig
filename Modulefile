@@ -1,5 +1,5 @@
 name 'adaptavist-postgresconfig'
-version '0.0.16'
+version '0.0.17'
 source 'https://github.com/Adaptavist/puppet-postgresconfig.git'
 author 'adaptavist'
 license 'apache2'

@@ -98,7 +98,7 @@ class postgresconfig (
     }
 
     if (str2bool($manage_recovery_conf)){
-        validate_hash($roles)
+        validate_hash($manage_recovery_conf)
         create_resources(postgresql::server::recovery, $recovery_params)
     }
 
