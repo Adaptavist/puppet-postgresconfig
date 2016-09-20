@@ -62,6 +62,30 @@ The group of the .pgpass file, defaults to 'root'
 
 A hash of postgres roles to create
 
+`postgresconfig::selinux_context`
+
+The selinux context to apply to postgres's data dir and backup dir (if specified), defaults to postgresql_db_t
+
+`postgresconfig::semanage_package`
+
+The package that contains semanage, the utility to manage selinux contexts, defaults to policycoreutils-python on RedHat based systems and policycoreutils on Debian based systems
+
+`postgresconfig::datadir`
+
+The PostgreSQL data dir, if not set or set to false its inherited from the main postgres module, if the system has selinux enabled then this directory will have a selinux context of `selinux_context` set, defaults to false (meaning it'll be inherited from postgres module)
+
+`postgresconfig::backupdir`
+
+A backup directory, if set with a value other than false this directory will also have a selinux context of `selinux_context` set, usefull if postgres is achiving WAL's to a local folder, defaults to false
+
+`postgresconfig::manage_recovery_conf`
+
+Flag to determine if we are managing recoery params (used in creating PostgreSQL replicaiton slave), defaults to false
+
+`postgresconfig::recovery_params`
+
+Hsh of recovery parameters, defaults to empty hash
+
 ## Example Usage:
  
     postgresconfig::listen_address: '127.0.0.1'

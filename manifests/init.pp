@@ -16,6 +16,7 @@ class postgresconfig (
     $selinux_context      = $postgresconfig::params::selinux_context,
     $semanage_package     = $postgresconfig::params::semanage_package,
     $datadir              = $postgresconfig::params::datadir,
+    $backupdir            = $postgresconfig::params::backupdir,
     $manage_recovery_conf = $postgresconfig::params::manage_recovery_conf,
     $recovery_params      = $postgresconfig::params::recovery_params,
     ) inherits postgresconfig::params {
@@ -107,7 +108,15 @@ class postgresconfig (
         ensure_packages([$semanage_package])
 
         exec { 'postgres_datadir_selinux':
-            command => "semanage fcontext -a -t ${selinux_context} \"${real_datadir}(/.*)?\" && restorecon -R -v ${real_datadir}"
+            command => "semanage fcontext -a -t ${selinux_context} \"${real_datadir}(/.*)?\" && restorecon -R -v ${real_datadir}",
+            require => Package[$semanage_package]
+        }
+
+        if ($backupdir and $backupdir != 'false' and $backupdir != false) {
+            exec { 'postgres_backupdir_selinux':
+                command => "semanage fcontext -a -t ${selinux_context} \"${backupdir}(/.*)?\" && restorecon -R -v ${backupdir}",
+                require => Package[$semanage_package]
+            }
         }
     }
 }
