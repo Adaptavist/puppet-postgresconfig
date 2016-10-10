@@ -105,7 +105,9 @@ class postgresconfig (
 
     # if selinux is enabled set the correct context on the datadir
     if str2bool($::selinux) {
-        ensure_packages([$semanage_package])
+        if ! defined(Package[$semanage_package]) {
+            ensure_packages([$semanage_package])
+        }
 
         exec { 'postgres_datadir_selinux':
             command => "semanage fcontext -a -t ${selinux_context} \"${real_datadir}(/.*)?\" && restorecon -R -v ${real_datadir}",
