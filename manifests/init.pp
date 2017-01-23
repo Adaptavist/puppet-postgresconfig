@@ -19,6 +19,8 @@ class postgresconfig (
     $backupdir            = $postgresconfig::params::backupdir,
     $manage_recovery_conf = $postgresconfig::params::manage_recovery_conf,
     $recovery_params      = $postgresconfig::params::recovery_params,
+    $pgpass_postgres_user = $postgresconfig::params::pgpass_postgres_user,
+    $pgpass_postgres_pass = $postgresconfig::params::pgpass_postgres_pass,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
@@ -28,10 +30,24 @@ class postgresconfig (
         default => false,
     }
 
+    # work out if we have a postgres (dba) password
     if ($postgres_password == 'false' or $postgres_password == false){
         $real_postgres_password = undef
-    } else {
+    }
+    else {
         $real_postgres_password = $postgres_password
+    }
+
+    # work out if we have a password to put in the pgpass file, if not fall back to postgres password
+    if ($pgpass_postgres_pass == 'false' or $pgpass_postgres_pass == false){
+        $real_pgpass_postgres_pass = $real_postgres_password
+    }
+    else {
+        $real_pgpass_postgres_pass = $pgpass_postgres_pass
+    }
+
+    # if there is a pgpass password creaet the pgpass file
+    if ($real_pgpass_postgres_pass != undef ) {
         # create a pgpass file if requested to do so
         if (str2bool($create_auth_file)) {
             file { $auth_file:
