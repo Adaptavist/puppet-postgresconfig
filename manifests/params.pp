@@ -30,5 +30,6 @@ class postgresconfig::params {
     $manage_recovery_conf = 'false'
     $recovery_params = {}
     $pgpass_postgres_user = 'postgres'
+    $pgpass_postgres_pass = 'false'
 }
 

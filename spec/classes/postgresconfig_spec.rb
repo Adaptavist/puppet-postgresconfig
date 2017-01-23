@@ -4,6 +4,7 @@ listen_address = "127.0.0.1"
 listen_port = "5432"
 postgres_password = 'password'
 pgpass_postgres_user = 'fred'
+pgpass_postgres_password = 'password77'
 auth_file = '/etc/my_auth_file'
 auth_file_owner = 'postgres'
 auth_file_group = 'postgres'
@@ -78,7 +79,7 @@ describe 'postgresconfig', :type => 'class' do
     }
   end
 
-  context "Should create pgpass file if password is set" do
+  context "Should create pgpass file, fall back to dba password if custom pgpass it not set" do
     let(:params) { 
       { 
           :listen_address => listen_address,
@@ -106,6 +107,38 @@ describe 'postgresconfig', :type => 'class' do
       )
       pgpass_test = catalogue().resource('file', auth_file).send(:parameters)[:content]
       expect("*:*:*:#{pgpass_postgres_user}:#{postgres_password}").to eq(pgpass_test)
+    }
+  end
+
+  context "Should create pgpass file with custom pgpass password" do
+    let(:params) { 
+      { 
+          :listen_address => listen_address,
+          :listen_port => listen_port,
+          :postgres_password => postgres_password,
+          :create_auth_file => true,
+          :auth_file => auth_file,
+          :auth_file_owner => auth_file_owner,
+          :auth_file_group => auth_file_owner,
+          :pgpass_postgres_user => pgpass_postgres_user,
+          :pgpass_postgres_pass => pgpass_postgres_password,
+      } 
+    }
+
+    it {
+      should contain_class('postgresql::server').with(
+        'listen_addresses' => listen_address,
+        'port' => listen_port,
+        'postgres_password'  => postgres_password
+      )
+      should contain_file(auth_file).with(
+          'ensure' => 'present',
+          'owner'  => auth_file_owner,
+          'group'  => auth_file_group,
+          'mode'   => '0600'
+      )
+      pgpass_test = catalogue().resource('file', auth_file).send(:parameters)[:content]
+      expect("*:*:*:#{pgpass_postgres_user}:#{pgpass_postgres_password}").to eq(pgpass_test)
     }
   end
 
