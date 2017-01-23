@@ -19,6 +19,7 @@ class postgresconfig (
     $backupdir            = $postgresconfig::params::backupdir,
     $manage_recovery_conf = $postgresconfig::params::manage_recovery_conf,
     $recovery_params      = $postgresconfig::params::recovery_params,
+    $pgpass_postgres_user = $postgresconfig::params::pgpass_postgres_user,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {

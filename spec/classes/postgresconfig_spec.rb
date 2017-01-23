@@ -3,6 +3,7 @@ require 'spec_helper'
 listen_address = "127.0.0.1"
 listen_port = "5432"
 postgres_password = 'password'
+pgpass_postgres_user = 'fred'
 auth_file = '/etc/my_auth_file'
 auth_file_owner = 'postgres'
 auth_file_group = 'postgres'
@@ -87,6 +88,7 @@ describe 'postgresconfig', :type => 'class' do
           :auth_file => auth_file,
           :auth_file_owner => auth_file_owner,
           :auth_file_group => auth_file_owner,
+          :pgpass_postgres_user => pgpass_postgres_user,
       } 
     }
 
@@ -103,7 +105,7 @@ describe 'postgresconfig', :type => 'class' do
           'mode'   => '0600'
       )
       pgpass_test = catalogue().resource('file', auth_file).send(:parameters)[:content]
-      expect("*:*:*:postgres:#{postgres_password}").to eq(pgpass_test)
+      expect("*:*:*:#{pgpass_postgres_user}:#{postgres_password}").to eq(pgpass_test)
     }
   end
 

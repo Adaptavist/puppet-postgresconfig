@@ -29,5 +29,6 @@ class postgresconfig::params {
     $backupdir = 'false'
     $manage_recovery_conf = 'false'
     $recovery_params = {}
+    $pgpass_postgres_user = 'postgres'
 }
 
