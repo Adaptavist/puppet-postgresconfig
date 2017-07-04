@@ -96,7 +96,7 @@ class postgresconfig (
     if (str2bool($install_contrib)) {
         package {$contrib_package:
             ensure  => 'present',
-            require => Package[$postgresql::server::package_name]
+            require => Package['postgresql-server']
         }
     }
 
@@ -104,7 +104,7 @@ class postgresconfig (
     if (str2bool($install_devel)) {
         package {$devel_package:
             ensure  => 'present',
-            require => Package[$postgresql::server::package_name]
+            require => Package['postgresql-server']
         }
     }
 
