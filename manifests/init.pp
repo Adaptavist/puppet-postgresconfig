@@ -1,26 +1,27 @@
 class postgresconfig (
-    $listen_address       = $postgresconfig::params::listen_address,
-    $listen_port          = $postgresconfig::params::listen_port,
-    $config_enties        = $postgresconfig::params::config_enties,
-    $hba_rules            = $postgresconfig::params::hba_rules,
-    $install_contrib      = $postgresconfig::params::install_contrib,
-    $contrib_package      = $postgresconfig::params::contrib_package,
-    $install_devel        = $postgresconfig::params::install_devel,
-    $devel_package        = $postgresconfig::params::devel_package,
-    $postgres_password    = $postgresconfig::params::postgres_password,
-    $create_auth_file     = $postgresconfig::params::create_auth_file,
-    $auth_file            = $postgresconfig::params::auth_file,
-    $auth_file_owner      = $postgresconfig::params::auth_file_owner,
-    $auth_file_group      = $postgresconfig::params::auth_file_group,
-    $roles                = $postgresconfig::params::roles,
-    $selinux_context      = $postgresconfig::params::selinux_context,
-    $semanage_package     = $postgresconfig::params::semanage_package,
-    $datadir              = $postgresconfig::params::datadir,
-    $backupdir            = $postgresconfig::params::backupdir,
-    $manage_recovery_conf = $postgresconfig::params::manage_recovery_conf,
-    $recovery_params      = $postgresconfig::params::recovery_params,
-    $pgpass_postgres_user = $postgresconfig::params::pgpass_postgres_user,
-    $pgpass_postgres_pass = $postgresconfig::params::pgpass_postgres_pass,
+    $listen_address               = $postgresconfig::params::listen_address,
+    $listen_port                  = $postgresconfig::params::listen_port,
+    $config_enties                = $postgresconfig::params::config_enties,
+    $hba_rules                    = $postgresconfig::params::hba_rules,
+    $install_contrib              = $postgresconfig::params::install_contrib,
+    $contrib_package              = $postgresconfig::params::contrib_package,
+    $install_devel                = $postgresconfig::params::install_devel,
+    $devel_package                = $postgresconfig::params::devel_package,
+    $postgres_password            = $postgresconfig::params::postgres_password,
+    $create_auth_file             = $postgresconfig::params::create_auth_file,
+    $auth_file                    = $postgresconfig::params::auth_file,
+    $auth_file_owner              = $postgresconfig::params::auth_file_owner,
+    $auth_file_group              = $postgresconfig::params::auth_file_group,
+    $roles                        = $postgresconfig::params::roles,
+    $selinux_context              = $postgresconfig::params::selinux_context,
+    $semanage_package             = $postgresconfig::params::semanage_package,
+    $datadir                      = $postgresconfig::params::datadir,
+    $backupdir                    = $postgresconfig::params::backupdir,
+    $manage_recovery_conf         = $postgresconfig::params::manage_recovery_conf,
+    $recovery_params              = $postgresconfig::params::recovery_params,
+    $pgpass_postgres_user         = $postgresconfig::params::pgpass_postgres_user,
+    $pgpass_postgres_pass         = $postgresconfig::params::pgpass_postgres_pass,
+    $archive_alternatives_install = $postgresconfig::params::archive_alternatives_install,
     ) inherits postgresconfig::params {
 
     $use_default_hba_rules = $hba_rules ? {
@@ -97,6 +98,20 @@ class postgresconfig (
         package {$contrib_package:
             ensure  => 'present',
             require => Package['postgresql-server']
+        }
+
+        if (str2bool($archive_alternatives_install)) {
+            # register pg_archivecleanup with alternatives
+            exec {'alternatives_install_pg_archivecleanup':
+                command => 'alternatives --install /usr/bin/pg_archivecleanup pgsql-pg_archivecleanup $(dirname $(readlink  -f /usr/bin/psql))/pg_archivecleanup 20000',
+                require => Package[$contrib_package],
+            }
+
+            # link pg_archivecleanup to /usr/bin
+            exec {'alternatives_set_pg_archivecleanup':
+                command => 'alternatives --set pgsql-pg_archivecleanup $(dirname $(readlink  -f /usr/bin/psql))/pg_archivecleanup',
+                require => Exec['alternatives_install_pg_archivecleanup'],
+            }
         }
     }
 

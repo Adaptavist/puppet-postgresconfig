@@ -31,5 +31,6 @@ class postgresconfig::params {
     $recovery_params = {}
     $pgpass_postgres_user = 'postgres'
     $pgpass_postgres_pass = 'false'
+    $archive_alternatives_install = 'false'
 }
 
