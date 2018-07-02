@@ -100,7 +100,7 @@ class postgresconfig (
             require => Package['postgresql-server']
         }
 
-        if (str2bool($archive_alternatives_install)) {
+        if (str2bool($archive_alternatives_install) and ($::osfamily == 'RedHat')) {
             # register pg_archivecleanup with alternatives
             exec {'alternatives_install_pg_archivecleanup':
                 command => 'alternatives --install /usr/bin/pg_archivecleanup pgsql-pg_archivecleanup $(dirname $(readlink  -f /usr/bin/psql))/pg_archivecleanup 20000',
