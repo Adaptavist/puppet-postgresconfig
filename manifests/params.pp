@@ -21,9 +21,14 @@ class postgresconfig::params {
     $auth_file_group = 'root'
     $roles = {}
     $selinux_context = 'postgresql_db_t'
-    $semanage_package = $::osfamily ? {
-        'RedHat' => 'policycoreutils-python',
-        'Debian' => 'policycoreutils',
+    if ($::osfamily == 'Debian') {
+        $semanage_package = 'policycoreutils'
+    } elsif ($::osfamily == 'RedHat') {
+        if ($::operatingsystem != 'Fedora' and $::operatingsystemmajrelease == '8') {
+            $semanage_package = 'policycoreutils-python-utils'
+        } else {
+            $semanage_package = 'policycoreutils-python'
+        }
     }
     $datadir = 'false'
     $backupdir = 'false'
